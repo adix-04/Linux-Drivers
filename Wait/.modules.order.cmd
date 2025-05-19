@@ -1,1 +1,0 @@
-savedcmd_/home/adin.n@acsiatech.com/Desktop/Drivers/Wait/modules.order := {   echo /home/adin.n@acsiatech.com/Desktop/Drivers/Wait/wait.o; :; } > /home/adin.n@acsiatech.com/Desktop/Drivers/Wait/modules.order

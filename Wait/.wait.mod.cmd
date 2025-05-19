@@ -1,1 +1,0 @@
-savedcmd_/home/adin.n@acsiatech.com/Desktop/Drivers/Wait/wait.mod := printf '%s\n'   wait.o | awk '!x[$$0]++ { print("/home/adin.n@acsiatech.com/Desktop/Drivers/Wait/"$$0) }' > /home/adin.n@acsiatech.com/Desktop/Drivers/Wait/wait.mod

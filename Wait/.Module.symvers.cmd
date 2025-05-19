@@ -1,1 +1,0 @@
-savedcmd_/home/adin.n@acsiatech.com/Desktop/Drivers/Wait/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/adin.n@acsiatech.com/Desktop/Drivers/Wait/Module.symvers -T /home/adin.n@acsiatech.com/Desktop/Drivers/Wait/modules.order -i Module.symvers -e 
