@@ -27,17 +27,17 @@ static int __init myinit(void)
 {
    major = register_chrdev(0,"Cdev",&fops);
    if(major < 0){
-    printk("Cdev:error registering device. . . .\n");
+    printk(KERN_ERR "Cdev:error registering device. . . .\n");
     return major;
    }
-   printk("Cdev :entering kernal major number = %d. . . . .\n",major);
+   printk(KERN_INFO "Cdev :entering kernal major number = %d. . . . .\n",major);
    return 0;
 }
 
 static void __exit myexit(void)
 {
     unregister_chrdev(major,"Cdev...\n");
-    printk("Cdev:exiting  .. . . . ..\n");
+    printk(KERN_INFO "Cdev:exiting  .. . . . ..\n");
 }
 module_init(myinit);
 module_exit(myexit);
