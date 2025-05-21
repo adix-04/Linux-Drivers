@@ -1,3 +1,6 @@
+/**
+ * irq registeration and handling function in linux kernal module
+ */
 #include<linux/module.h>
 #include<linux/init.h>
 #include<linux/fs.h>

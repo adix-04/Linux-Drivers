@@ -1,3 +1,6 @@
+/**
+ * creating a file in proc file system and performing operations
+ */
 #include<linux/module.h>
 #include<linux/init.h>
 #include<linux/fs.h>

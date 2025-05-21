@@ -1,3 +1,8 @@
+/**
+ * The goal of this program is to show the usage of spinlock in a multithreaded code
+ * the shared variable accessed through spinlock,unlock mechanism by threads and top half of irq and bottom half
+ * from the logs i can see irq is registered by running cat /proc/interupts but i dont know if a interupt has been invoking
+ */
 #include<linux/init.h>
 #include<linux/fs.h>
 #include<linux/module.h>
@@ -11,8 +16,9 @@ unsigned long globalVar = 0;
 static struct task_struct *thread2 ;
 static struct task_struct *thread1 ;
 struct tasklet_struct* tasklet = NULL;
-
+/*defining spinlock */
 DEFINE_SPINLOCK(spinlock);
+/*tasklet function for bottom half*/
 static void tasklet_fun(unsigned long var);
 /*file operations for the char device, it is needed beacuse linux treats evrything as a file*/
 static struct file_operations fops ={
@@ -29,8 +35,13 @@ static void tasklet_fun(unsigned long var)
   globalVar ++ ;
   spin_unlock(&spinlock);
 }
+/**
+ * @brief thread function to be executed by thread
+ * @param void pointer 
+ */
 int threadfunction(void* thread_nr)
 {
+  /*execute till the thread stops*/
  while(!kthread_should_stop()){
   if(!spin_is_locked(&spinlock)){
     printk(KERN_INFO "Thread : spin lock is not locked inside function 1\n");
@@ -42,7 +53,7 @@ int threadfunction(void* thread_nr)
   major ++ ;
   printk(KERN_DEBUG "Thread : Value in function 1 : %d \n",major);
   spin_unlock(&spinlock);
-  msleep(2000);
+  msleep(3000);
  }
  printk(KERN_INFO "Thread 1 finished execution with :%d\n",major);  
  return 0;        
@@ -61,7 +72,7 @@ int threadfunction2(void* thread_nr)
   major ++ ;
   printk(KERN_DEBUG "Thread : Value in function 2 : %d \n",major);
   spin_unlock(&spinlock);
-  msleep(2000);
+  msleep(3000);
  }
  printk(KERN_INFO "Thread 2 finished execution with  :%d\n",major);  
  return 0;        
@@ -137,6 +148,6 @@ module_exit(myExit);
 
 MODULE_AUTHOR("ADIN");
 MODULE_LICENSE ("GPL");
-MODULE_DESCRIPTION("Threads in linux kernal module"); 
+MODULE_DESCRIPTION("Threads and spinlock in linux kernal module"); 
 
 

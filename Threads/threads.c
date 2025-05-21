@@ -7,10 +7,7 @@
 
 static int  major;
 static struct task_struct *thread1 ;
-static struct task_struct *thread2 ;
-static int t1, t2 ;
-
-
+static int t1=1 ;
 
 /*file operations for the char device, it is needed beacuse linux treats evrything as a file*/
 static struct file_operations fops ={
@@ -26,7 +23,7 @@ int threadfunction(void* thread_nr)
  int t_nr = *(int*)thread_nr;
  while(!kthread_should_stop()){
     printk(KERN_INFO "Thread %d is executed and counter value : %d",t_nr,i++);
-    msleep(t_nr * 10000);
+    msleep(t_nr * 1000);
  }
  printk(KERN_INFO "Thread %d finished execution with counter :%d",t_nr,i);  
  return 0;        
@@ -43,14 +40,6 @@ static int __init myInit(void){
     wake_up_process(thread1);
     printk(KERN_INFO " Thread 1 is created");
   } else {
-    printk(KERN_ERR "Error creating thread");
-  }
-  /*thread creation and running in single command*/
-  thread2 = kthread_run(threadfunction,&t2,"thread 2");
-  if(thread2 != NULL){
-    printk(KERN_INFO "Thread 2 is created");
-  } else {
-    kthread_stop(thread1);
     printk(KERN_ERR "Error creating thread");
   }
 

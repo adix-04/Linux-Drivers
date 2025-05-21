@@ -1,3 +1,7 @@
+/**
+ * charecter device code with read write open close opertaions
+ * ioctl unlocked as well
+ */
 #include<linux/init.h>
 #include<linux/fs.h>
 #include<linux/module.h>
