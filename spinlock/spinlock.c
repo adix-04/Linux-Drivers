@@ -17,7 +17,7 @@ static struct task_struct *thread2 ;
 static struct task_struct *thread1 ;
 struct tasklet_struct* tasklet = NULL;
 /*defining spinlock */
-DEFINE_SPINLOCK(spinlock);
+DEFINE_SPINLOCK(spinlock);  //spinlock_t spinlock = __SPIN_LOCK_UNLOCKED(x)
 /*tasklet function for bottom half*/
 static void tasklet_fun(unsigned long var);
 /*file operations for the char device, it is needed beacuse linux treats evrything as a file*/
