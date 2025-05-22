@@ -38,7 +38,7 @@ static struct file_operations fops={
 };
 /*this is the usb class driver struct there are things we need to add inside this structure used inside registering device*/
 struct usb_class_driver usb_driver={
-    .name           = "usbDriver%d",
+    .name           = "customusbDriver%d",
     .fops           = &fops,
     .minor_base     = 192
 };
