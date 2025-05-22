@@ -1,11 +1,13 @@
-source _names.sh
+# source _names.sh  for some reason its not working 
+#This code is partially inspired from https://github.com/agnath18K/acpi_ec/blob/main/install.sh
+#installation code 
 MODULE_NAME="usbDriver"
 MODULE_PATH="/lib/modules/$(uname -r)/kernel/drivers/acpi"
 MODULE_LOAD_DIR="/etc/modules-load.d"
 #set -e means evac as soon as possible upon fail
 set -e
 #checking for sudo permission if we rn with sudo EUID will be 0 .
-if [[ "$EUID" != 0 ]]; then           #this is tough spaces are very crazy over here
+if [[ "$EUID" != 0 ]]; then           #this is tough ! spaces are very crazy over here
     echo " run as root to continue"
     exit 1
 fi
