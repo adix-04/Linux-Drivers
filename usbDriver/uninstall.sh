@@ -1,5 +1,5 @@
 #This code is partially inspired from https://github.com/agnath18K/acpi_ec/blob/main/install.sh
-
+#uninstallation code
 #source _names.sh #for some reason this is not working idk why, im just gonna use it inside the code 
 #these variables holds the names
 MODULE_NAME="usbDriver"
