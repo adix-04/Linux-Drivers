@@ -15,7 +15,7 @@ all:
 	sudo cp $(MODULE_NAME).ko /lib/modules/$(KVER)/kernel/drivers/acpi/
 	sudo depmod -a
 	sudo modprobe $(MODULE_NAME)
-uninstall:
+uninstall:clean
 	sudo rm -f /lib/modules/$(KVER)/kernal/drivers/acpi/$(MODULE_NAME).ko
 	sudo depmod -a
 	sudo modprobe -r $(MODULE_NAME)
