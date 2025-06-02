@@ -29,7 +29,7 @@ fi
 
 #remove the autoconfiguraton from the module.conf folder
 echo "Removing auto configuration .. "
-rm -f "$MODULE_LOAD_DIR/$MODULE_NAME.conf"
+rm -rf "$MODULE_LOAD_DIR/$MODULE_NAME.conf"
 
 echo "removing module"
 #calling the uinstall target inside make
