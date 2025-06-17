@@ -21,4 +21,6 @@ uninstall:clean
 	sudo modprobe -r $(MODULE_NAME)
 clean:
 	make -C /lib/modules/$(KVER)/build  M=$(PWD) clean
+test:
+	make -C /lib/modules/$(KVER)/build M=$(PWD) modules
    

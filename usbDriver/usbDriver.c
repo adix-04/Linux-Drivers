@@ -15,12 +15,26 @@
 struct usb_device{
     struct usb_device *usbdev;
     struct usb_class_driver *usbclassdrv;
-
+    struct usb_interface* interface;
+    struct kref kref;
 }
 
 
 static int usb_open (struct inode *inode, struct file *file){
     printk(KERN_INFO "USB : open fops called \n");
+    struct usb_device *udev;
+    struct usb_interface* iface;
+    int subminor;
+    subminor = iminor(inode);
+    iface = usb_find_interface(&usb_driver,subminor);
+
+    if(!iface){
+        return -ENODEV ;
+    }
+
+    udev = usb_get_intfdata(iface);
+    file->private_data = udev;
+   
     return 0 ;
 }
 static int usb_close (struct inode *inode, struct file *file){
@@ -32,6 +46,7 @@ static ssize_t usb_read (struct file *file, char __user *userbuf, size_t len, lo
     return 0;
 }
 static ssize_t usb_write(struct file *file, const char __user *userbuf, size_t len, loff_t *off){
+
     printk(KERN_INFO " USB : write called\n");
     return 0;
 }
@@ -92,7 +107,7 @@ static int usb_dev_resume (struct usb_interface *intf){
 static struct usb_device_id usb_dev_idtable[] ={
     {
     USB_DEVICE(USB_VENDOR,USB_PRODUCT),
-    USB_DEVICE(USB_VENDOR1,USB_PRODUCT1)
+
     },
     {}
 };
