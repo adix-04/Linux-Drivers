@@ -10,6 +10,13 @@
 /*define vendor id and product id (find it by lsusb -v) this way make it more easy*/
 #define USB_VENDOR 0x14cd
 #define USB_PRODUCT 0x1212
+#define USB_MINOR 192
+
+struct usb_device{
+    struct usb_device *usbdev;
+    struct usb_class_driver *usbclassdrv;
+
+}
 
 
 static int usb_open (struct inode *inode, struct file *file){
@@ -40,7 +47,7 @@ static struct file_operations fops={
 struct usb_class_driver usb_driver={
     .name           = "customusbDriver%d",
     .fops           = &fops,
-    .minor_base     = 192
+    .minor_base     = USB_MINOR
 };
 /**
  * @brief this function called as the probe function when we load our usb,inside we need to add the interface
@@ -84,7 +91,8 @@ static int usb_dev_resume (struct usb_interface *intf){
  */
 static struct usb_device_id usb_dev_idtable[] ={
     {
-    USB_DEVICE(USB_VENDOR,USB_PRODUCT)
+    USB_DEVICE(USB_VENDOR,USB_PRODUCT),
+    USB_DEVICE(USB_VENDOR1,USB_PRODUCT1)
     },
     {}
 };
@@ -104,7 +112,11 @@ static struct usb_driver usb_dev_driver ={
 
 static int __init usb_init(void){
     printk(KERN_INFO "USB : initializing driver \n");
-    usb_register(&usb_dev_driver);
+    int result = usb_register(&usb_dev_driver);
+    if(result < 0){
+        pr_err("USB : register failed with ER :no %d .. \n",result);
+        return -1;
+    }
     return 0;
 }
 static void __exit usb_exit(void){
