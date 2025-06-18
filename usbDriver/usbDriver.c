@@ -54,9 +54,7 @@ static int usb_open (struct inode *inode, struct file *file)
     }
 
     udev = usb_get_intfdata(iface);
-  
     file->private_data = udev;
-   
     return 0 ;
 }
 static int usb_close (struct inode *inode, struct file *file){
@@ -82,13 +80,14 @@ static ssize_t usb_read (struct file *file, char *buffer, size_t count,loff_t *p
                         usb_rcvbulkpipe(dev->usbdev,dev->bulk_in_endpointAddr),
                         dev->bulk_in_buffer,
                         min(dev->bulk_in_size,count),
-                        &read_cnt,100000);
+                        &read_cnt,5000);
 
     if(retval){
-        pr_info("USB : bulk msg OK   \n");
-        return retval; } 
+        pr_info("USB : bulk msg ERR   \n");
+        return retval; 
+        } 
     else {
-        pr_err("USB : bulk_msgs retured error code . . \n");
+        pr_err("USB : bulk_msgs retured OK code . . \n");
     }
     if(copy_to_user(buffer,dev->bulk_in_buffer,read_cnt))
         {
@@ -142,8 +141,15 @@ static int usb_dev_probe (struct usb_interface *intf,const struct usb_device_id 
         return -ENOMEM;
     
     int i, ret ;
+    /**
+     * init for the kref and mutex
+     */
     kref_init(&dev->kref);
     mutex_init(&dev->io_mutex);
+    /**
+     * interface_to_usbdev(intf) gets you the struct usb_device * from the usb_interface 
+     *usb_get_dev() increments the reference count of that USB device, so it doesn’t get deallocated while your driver is using it.
+    */
     dev->usbdev = usb_get_dev(interface_to_usbdev(intf));
     dev->interface = usb_get_intf(intf);
     usb_interface_desc = intf->cur_altsetting ;
@@ -155,22 +161,8 @@ static int usb_dev_probe (struct usb_interface *intf,const struct usb_device_id 
      * @brief there may ne multiple endpoints available each with IN or OUT ops 
      * now we are checking for the IN that is why  we loop through all endpoints till we find the bulk_in one see the loop below
      */
-    /*
-    for(i = 0 ;i < usb_interface_desc->desc.bNumEndpoints ; i++){
-        endpoint = &usb_interface_desc->endpoint[i].desc;
-        
-        if(usb_endpoint_is_bulk_in(endpoint)){
-            dev->bulk_in_size = usb_endpoint_maxp(endpoint);
-            dev->bulk_in_endpointAddr = endpoint->bEndpointAddress;
-            dev->bulk_in_buffer = kmalloc(dev->bulk_in_size,GFP_KERNEL);
-            if(!dev->bulk_in_buffer)
-                return -ENOMEM;
-            break;
-        }
-        if(usb_endpoint_is_bulk_out(endpoint)){
-            
-        }
-    } */
+    
+ 
 /**
 * inside the usb_skelton file they did something like this i dont know why they did that in the first place
 * for now i am sticking with it .
@@ -207,6 +199,7 @@ static int usb_dev_probe (struct usb_interface *intf,const struct usb_device_id 
     dev->bulk_in_endpointAddr = endpoint_in->bEndpointAddress;
     dev->bulk_in_buffer = kmalloc(dev->bulk_in_size,GFP_KERNEL);
     printk("USB : flag");
+
     if(!dev->bulk_in_buffer){
        printk(KERN_ERR "USB : ERROR Finding THE bulk in buffer area. . .\n");
        return -ENOMEM;
@@ -287,3 +280,17 @@ MODULE_AUTHOR("Adin N S <adinnavakumar22@gmail.com>");
 MODULE_DESCRIPTION("Simple linux driver module");
 MODULE_LICENSE("GPL");
 
+
+//    for(i = 0 ;i < usb_interface_desc->desc.bNumEndpoints ; i++){
+//         endpoint_in = &usb_interface_desc->endpoint[i].desc;
+        
+//         if(usb_endpoint_is_bulk_in(endpoint_in)){
+//             dev->bulk_in_size = usb_endpoint_maxp(endpoint_in);
+//             dev->bulk_in_endpointAddr = endpoint_in->bEndpointAddress;
+//             dev->bulk_in_buffer = kmalloc(dev->bulk_in_size,GFP_KERNEL);
+//             if(!dev->bulk_in_buffer)
+//                 return -ENOMEM;
+//             break;
+//         }
+        
+//     } 
