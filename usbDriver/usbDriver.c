@@ -49,9 +49,10 @@ static int usb_open (struct inode *inode, struct file *file)
     struct usb_interface* iface;
     int subminor;
     subminor = iminor(inode);
+    pr_debug("USB : Subminor number %d \n",subminor);
     iface = usb_find_interface(&usb_dev_driver,subminor);
-
     if(!iface){
+        pr_info("USB : ERROR with interface here");
         return -ENODEV ;
     }
 
@@ -63,7 +64,7 @@ static int usb_close (struct inode *inode, struct file *file){
     printk(KERN_ALERT "USB  : File close ops called \n");
     return 0;
 }
-static ssize_t usb_read (struct file *file, char *buffer, size_t count,loff_t *ppos){
+static ssize_t usb_read (struct file *file,char *buffer, size_t count,loff_t *ppos){
     printk(KERN_INFO "USB : Read called \n");
     struct usb_skel* dev = file->private_data;
     int retval ;
@@ -101,10 +102,39 @@ static ssize_t usb_read (struct file *file, char *buffer, size_t count,loff_t *p
 
     return read_cnt;
 }
-static ssize_t usb_write(struct file *file, const char __user *userbuf, size_t len, loff_t *off){
-
-    printk(KERN_INFO " USB : write called\n");
-    return 0;
+static ssize_t usb_write(struct file *file, const char *buffer, size_t count,loff_t *ppos){
+    struct usb_skel *dev = file->private_data;
+    int retval,write_cnt;
+    if (count > dev->bulk_out_size)
+        count = dev->bulk_out_size;
+    char *kbuf;
+    if(!dev){
+        dev_err(&dev->interface->dev,"USB : error in usb device \n");
+        return -ENODEV;
+    } 
+    pr_info("USB : Writing %zu bytes to endpoint 0x%02x\n", count, dev->bulk_out_endpointAddr);
+    kbuf = memdup_user(buffer , count);
+    if(IS_ERR(kbuf)){
+        dev_err(&dev->interface->dev,"USB : error in storing kernel buffer \n");
+        return PTR_ERR(kbuf);
+    }
+    retval = usb_bulk_msg(dev->usbdev,
+                          usb_sndbulkpipe(dev->usbdev,dev->bulk_out_endpointAddr),
+                          kbuf,
+                          count,
+                          &write_cnt,
+                          5000);
+    pr_debug("USB : retval is %d \n",retval);
+    if(retval){
+         pr_err("USB : bulk msg ERR   \n");
+         return retval; 
+        } 
+    else {
+        pr_debug("USB : bulk_msgs retured OK code . . \n");
+    }
+    printk(KERN_INFO "USB : write called\n");
+    kfree(kbuf);
+    return write_cnt;
 }
 static struct file_operations fops={
     .owner      = THIS_MODULE,
